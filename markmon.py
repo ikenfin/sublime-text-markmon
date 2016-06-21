@@ -98,7 +98,11 @@ class MarkmonClient:
          if self.settings.running and MARKDOWN_SYNTAX.match(view.scope_name(0)):
             try:
                 connection = http.client.HTTPConnection(self.settings.client_url)
-                connection.request('PUT', '/', view.substr(sublime.Region(0, view.size())).encode('utf-8'))
+                # connection.request('PUT', '/', view.substr(sublime.Region(0, view.size())).encode('utf-8'))
+                openedfile_path = sublime.active_window().active_view().file_name()
+                shebang_comment = u'<!--FILEPATH:[' + openedfile_path + u'];-->'
+                payload = b"".join([shebang_comment.encode('utf-8'), view.substr(sublime.Region(0, view.size())).encode('utf-8')])
+                connection.request('PUT', '/', payload)
                 connection.getresponse()
             except ConnectionRefusedError:
                 if self.server:
